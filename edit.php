@@ -12,7 +12,23 @@
 
     //取得できた編集対象のデータを$feedに格納
     $feed = $stmt->fetch(PDO::FETCH_ASSOC);
+
+       if (!empty($_POST)) {
+        $update_sql = "UPDATE `feeds` SET `feed` = ? WHERE `feeds`.`id` = ?";
+
+        $data = array($_POST["feed"],$feed_id);
+        $stmt = $dbh->prepare($update_sql);
+        $stmt->execute($data);
+
+        header("Location: timeline.php");
+        exit();
+    }
+
 ?>
+
+
+
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -27,7 +43,7 @@
         <div class="row">
             <!-- ここにコンテンツ -->
             <div class="col-xs-4 col-xs-offset-4">
-                <form class="form-group" method="post">
+                <form class="form-group" method="post" action="timeline.php">
                     <img src="user_profile_img/<?php echo $feed["profile_image"] ?>"  width="60">
                     <?= $feed['name'] ?><br>
                     <?= $feed['created']?><br>
