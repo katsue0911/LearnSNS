@@ -13,10 +13,11 @@
     //取得できた編集対象のデータを$feedに格納
     $feed = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    //更新処理（更新ボタンが押された時発動）
        if (!empty($_POST)) {
-        $update_sql = "UPDATE `feeds` SET `feed` = ? WHERE `feeds`.`id` = ?";
-
-        $data = array($_POST["feed"],$feed_id);
+        $update_sql = "UPDATE `feeds` SET `feed` = ? WHERE `feeds`.`id` = ?";//変更したつぶやきをDBに上書き保存する。
+        //UPDATE 指定したいテーブル名　SET テーブルのカラム名　WHERE テーブルの何を元にUPDATEするか指定
+        $data = array($_POST["feed"],$feed_id);//GET送信されたidは$feed_id
         $stmt = $dbh->prepare($update_sql);
         $stmt->execute($data);
 
@@ -25,9 +26,6 @@
     }
 
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="ja">
