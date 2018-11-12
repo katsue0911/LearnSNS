@@ -44,9 +44,35 @@
       break;
     }
 
+
+    //いいね済みかどうかの確認。（誰にとって、イイね済みなのか）
+    $like_flag_sql = "SELECT * FROM `likes` WHERE `user_id`=? AND `feed_id` = ?";
+    $like_flag_data = ($signin_user['id'], $feed['id']);
+    $like_flag_stmt = $dbh->prepare($like_flag_sql);
+    $like_flag_stmt->execute($like_flag_data);
+    $is_liked = $like_flag_stmt->fetch(PDO::FETCH_ASSOC);
+
+    //三項演算子(if文の省略形。代入のみの場合に使える)
+    $feed['is_liked'] = $is_liked ? ture:false;
+    // if($is_liked){ $feed['is_liked'] = true; }else{$feed['is_liked'] = false; }と同じ意味
+
+
+
+
+    //$feed連想配列にLIke数を格納するキーを用意し、数字を代入する。
+    //代入するLike数を取得するSQL文の実行(上でSQL文を実行中なので代入する変数名は違うものにする)
+    $like_sql ='SELECT COUNT(*) as `like_count` FROM `likes` WHERE `feed_id` =?';
+    $like_data = array($feed['id']);
+    $like_stmt = $dbh->prepare($like_sql);
+    $like_stmt->execute($like_data);
+
+    $like_count_data = $like_stmt->fetch(PDO::FETCH_ASSOC);
+    
+    $feed['like_count'] = $like_count_data['like_count'];
+
+    // v($feed,'$feed');
+
     $feeds[]= $feed;  //配列の末尾にデータを追加するという意味
-
-
 
     }
 
@@ -92,6 +118,9 @@
         </form>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
+            <span hidden id="signin-user"><?php echo $signin_user['id']; ?></span>
+            <!-- ページ自体にUserID何番かを読み取るように設定 id にしたのは、サインインできるのは一人だけだから-->
+            <!-- echo＝実行する。これがないと実行されずなんのデータも飛ばない -->
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img src="user_profile_img/<?php echo $signin_user['img_name'] ?>" width="18" class="img-circle"><?= $signin_user['name']?><span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a href="#">マイページ</a></li>
@@ -128,7 +157,7 @@
 <!-- つぶやき -->
         <!-- requireとincludeの違い：どちらも外部ファイルを読みこむ。
         require...読み込んだ外部ファイル内でエラーが発生した場合、処理を中断する
-        include...読み込んだ外部ファイル内でエラーが発生した場合、処理を継続する 
+        include...読み込んだ外部ファイル内でエラーが発生した場合、処理を継続する
         用途：require...DB接続などのエラーが出ると致命的な処理に使用
              include...HTML,CSSなど表示系に使用（一部表示にエラーが出ていても処理ができる可能性がある）
            -->
@@ -149,5 +178,7 @@
   <script src="assets/js/jquery-3.1.1.js"></script>
   <script src="assets/js/jquery-migrate-1.4.1.js"></script>
   <script src="assets/js/bootstrap.js"></script>
+  <script src="assets/js/app.js"></script>
+
 </body>
 </html>
