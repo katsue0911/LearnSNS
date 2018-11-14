@@ -4,7 +4,7 @@
 
     $feed_id = $_POST["feed_id"];//app.jsでPOST送信したデータがここにくる
     $user_id = $_POST["user_id"];
-    $is_liked = $_POST["is_liked"];
+    // $is_liked = $_POST["is_liked"];
 
     if (isset($_POST["is_liked"])) {
       //いいね!ボタンを押された時
