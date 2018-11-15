@@ -15,25 +15,35 @@
       $feed='';
 
     if (!empty($_POST)) {
-      $feed = $_POST['feed'];
-      if ($feed == '') {
+        $feed = $_POST['feed'];
+        if ($feed == '') {
         $validations['feed'] = 'blank';
-      }else{
+        }else{
         $sql = 'INSERT INTO `feeds` SET `user_id`=?, `feed`=?, `created`=NOW()';
         $stmt = $dbh->prepare($sql);
         $data = array($signin_user['id'], $feed);
         $stmt->execute($data);
-      }
+        }
     }
 
-    //一覧データの取得
-   // $sql ='SELECT * FROM `feeds` ORDER BY `created` DESC';
-    //一覧データを取得するSELECT文を記述。DESC 大きい数字から小さい数字に並べる。ASC 小さい数字から大きい数字に並べる。
-    $sql = 'SELECT `f`.*, `u`.`name`, `u`.`img_name` AS `profile_image` FROM `feeds` AS `f` INNER JOIN `users` AS `u` ON `f`. `user_id` = `u`.`id` ORDER BY `created` DESC';
-    $data = array();//？がないから置き換える必要がないので空でOK。あとで付け加えるカモだから作っておく。
-    $stmt = $dbh->prepare($sql);
-    $stmt->execute($data);
-    $feeds = []; //配列データを全て格納する配列
+    // v($_GET['search_word'],$_GET["search_word"]);
+    if (isset($_GET['search_word'])) {
+        //検索ワードがあるとき
+        $sql = 'SELECT `f`.*, `u`.`name`, `u`.`img_name` AS `profile_image` FROM `feeds` AS `f` INNER JOIN `users` AS `u` ON `f`. `user_id` = `u`.`id` WHERE `f`.`feed` LIKE ? ORDER BY `created` DESC';
+        $search_word="%".$_GET['search_word']."%";
+        $data = [$search_word];
+        }else{
+        //検索ワードがない時
+        //一覧データの取得
+        // $sql ='SELECT * FROM `feeds` ORDER BY `created` DESC';
+        //一覧データを取得するSELECT文を記述。DESC 大きい数字から小さい数字に並べる。ASC 小さい数字から大きい数字に並べる。
+        $sql = 'SELECT `f`.*, `u`.`name`, `u`.`img_name` AS `profile_image` FROM `feeds` AS `f` INNER JOIN `users` AS `u` ON `f`. `user_id` = `u`.`id` ORDER BY `created` DESC';
+        $data = array();//？がないから置き換える必要がないので空でOK。あとで付け加えるカモだから作っておく。
+        }
+    
+        $stmt = $dbh->prepare($sql);
+        $stmt->execute($data);
+        $feeds = []; //配列データを全て格納する配列
 
     
     while(true){
